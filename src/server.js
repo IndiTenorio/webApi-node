@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { getBody } from './middlewares/json.js';
 
 const PORT = 3838;
 
@@ -8,19 +9,7 @@ const server = http.createServer(async (req, res) => {
   const { method, url } = req;
 
   // middlewares
-  const buffers = [];
-  for await (const chunck of req) {
-    buffers.push(chunck);
-  }
-
-  const buffersString = Buffer.concat(buffers).toString();
-  try {
-    req.body = JSON.parse(buffersString);
-  } catch (error) {
-    req.body = null;
-  }
-
-  res.setHeader('Content-type', 'application/json');
+  await getBody(req, res);
 
   // rotas
   if (method === 'GET' && url === '/users') {
