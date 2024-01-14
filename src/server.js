@@ -1,9 +1,10 @@
 import http from 'node:http';
 import { getBody } from './middlewares/json.js';
+import { DbConnection } from './infra/dbConnection.js';
 
 const PORT = 3838;
 
-const users = [];
+const dbConnection = new DbConnection();
 
 const server = http.createServer(async (req, res) => {
   const { method, url } = req;
@@ -13,11 +14,11 @@ const server = http.createServer(async (req, res) => {
 
   // rotas
   if (method === 'GET' && url === '/users') {
-    return res.end(JSON.stringify(users));
+    return res.end(JSON.stringify(dbConnection.get('users')));
   }
 
   if (method === 'POST' && url === '/users') {
-    users.push(req.body);
+    dbConnection.insert('veiculos', req.body);
     return res.writeHead(201).end();
   }
 
